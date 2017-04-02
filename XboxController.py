@@ -408,62 +408,22 @@ if __name__ == '__main__':
 	xboxCont.write_outputs()
 
     def aBtnCallback(id):
-        #print("A, 18: 0; 24: 0; 26: 1")
-	#xboxCont.aValue = GPIO.LOW
-	#xboxCont.bValue = GPIO.LOW
-	#xboxCont.cValue = GPIO.HIGH
-	currAValue = GPIO.LOW
-        currBValue = GPIO.HIGH
-        currCValue = GPIO.LOW
         setDirection(GPIO.LOW, GPIO.LOW, GPIO.LOW)
 
     def bBtnCallback(id):
-        #print("B, 18: 0; 24: 1; 26: 0")
- 	#xboxCont.aValue = GPIO.LOW
-	##xboxCont.bValue = GPIO.HIGH
-	#xboxCont.cValue = GPIO.LOW
-
-        currAValue = GPIO.LOW
-        currBValue = GPIO.LOW
-        currCValue = GPIO.HIGH
         setDirection(GPIO.HIGH, GPIO.LOW, GPIO.LOW)
 
     def xBtnCallback(id):
-        #print("X, 18: 1; 24: 0; 26: 0")
-	#xboxCont.aValue = GPIO.HIGH
-	#xboxCont.bValue = GPIO.LOW
-	#xboxCont.cValue = GPIO.LOW
-        
-        
-        
         setDirection(GPIO.LOW, GPIO.HIGH, GPIO.LOW)
 	
     def yBtnCallback(id):
-        #print("Y, 18: 1; 24: 1; 26: 0")
-        #xboxCont.aValue = GPIO.HIGH
-	#xboxCont.bValue = GPIO.HIGH
-	#xboxCont.cValue = GPIO.LOW
-	
-	
-        
         setDirection(GPIO.HIGH, GPIO.HIGH, GPIO.LOW)
 
     def rTriggerCallback(id):
-        #print("Right trigger, 18: 0; 24: 0; 26: 0")
-        #xboxCont.aValue = GPIO.HIGH
-	#xboxCont.bValue = GPIO.HIGH
-	#xboxCont.cValue = GPIO.HIGH
-	currAValue = GPIO.HIGH
-	
-	currCValue = GPIO.HIGH
-	setDirection(GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
+        setDirection(GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
 
     def stopCallback(id):
-        xboxCont.aValue = GPIO.HIGH
-	xboxCont.bValue = GPIO.HIGH
-
-	xboxCont.cValue = GPIO.HIGH
-        setDirection(currAValue, currBValue, GPIO.HIGH)
+        setDirection(GPIO.LOW, GPIO.LOW, GPIO.HIGH)
 
     def goCallback(id):
         setDirection(currAValue, currBValue, GPIO.LOW)
