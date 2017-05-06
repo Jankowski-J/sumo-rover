@@ -253,11 +253,12 @@ class XboxController(threading.Thread):
         # set SDL to use the dummy NULL video driver, so it doesn't need a windowing system.
         #os.environ["SDL_VIDEODRIVER"] = "dummy"
 	os.putenv("SDL_VIDEODRIVER", "fbcon")
+	#os.environ["SDL_VIDEODRIVER"] = "dummy"
 	pygame.display.init()
         # init pygame
         pygame.init()
         # create a 1x1 pixel screen, its not used so it doesnt matter
-        screen = pygame.display.set_mode((1, 1))
+        #screen = pygame.display.set_mode((1, 1))
         # init the joystick control
         pygame.joystick.init()
         # how many joysticks are there
@@ -408,22 +409,62 @@ if __name__ == '__main__':
 	xboxCont.write_outputs()
 
     def aBtnCallback(id):
+        #print("A, 18: 0; 24: 0; 26: 1")
+	#xboxCont.aValue = GPIO.LOW
+	#xboxCont.bValue = GPIO.LOW
+	#xboxCont.cValue = GPIO.HIGH
+	currAValue = GPIO.LOW
+        currBValue = GPIO.HIGH
+        currCValue = GPIO.LOW
         setDirection(GPIO.LOW, GPIO.LOW, GPIO.LOW)
 
     def bBtnCallback(id):
+        #print("B, 18: 0; 24: 1; 26: 0")
+ 	#xboxCont.aValue = GPIO.LOW
+	##xboxCont.bValue = GPIO.HIGH
+	#xboxCont.cValue = GPIO.LOW
+
+        currAValue = GPIO.LOW
+        currBValue = GPIO.LOW
+        currCValue = GPIO.HIGH
         setDirection(GPIO.HIGH, GPIO.LOW, GPIO.LOW)
 
     def xBtnCallback(id):
+        #print("X, 18: 1; 24: 0; 26: 0")
+	#xboxCont.aValue = GPIO.HIGH
+	#xboxCont.bValue = GPIO.LOW
+	#xboxCont.cValue = GPIO.LOW
+        
+        
+        
         setDirection(GPIO.LOW, GPIO.HIGH, GPIO.LOW)
 	
     def yBtnCallback(id):
+        #print("Y, 18: 1; 24: 1; 26: 0")
+        #xboxCont.aValue = GPIO.HIGH
+	#xboxCont.bValue = GPIO.HIGH
+	#xboxCont.cValue = GPIO.LOW
+	
+	
+        
         setDirection(GPIO.HIGH, GPIO.HIGH, GPIO.LOW)
 
     def rTriggerCallback(id):
-        setDirection(GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
+        #print("Right trigger, 18: 0; 24: 0; 26: 0")
+        #xboxCont.aValue = GPIO.HIGH
+	#xboxCont.bValue = GPIO.HIGH
+	#xboxCont.cValue = GPIO.HIGH
+	currAValue = GPIO.HIGH
+	
+	currCValue = GPIO.HIGH
+	setDirection(GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
 
     def stopCallback(id):
-        setDirection(GPIO.LOW, GPIO.LOW, GPIO.HIGH)
+        xboxCont.aValue = GPIO.HIGH
+	xboxCont.bValue = GPIO.HIGH
+
+	xboxCont.cValue = GPIO.HIGH
+        setDirection(currAValue, currBValue, GPIO.HIGH)
 
     def goCallback(id):
         setDirection(currAValue, currBValue, GPIO.LOW)
