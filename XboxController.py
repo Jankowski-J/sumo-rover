@@ -15,6 +15,14 @@ GPIO.setup(26, GPIO.OUT)
 GPIO.setup(24, GPIO.OUT)
 GPIO.output(24, GPIO.HIGH)
 GPIO.setup(18, GPIO.OUT)
+GPIO.setup(5, GPIO.OUT)
+GPIO.setup(7, GPIO.OUT)
+GPIO.setup(8, GPIO.OUT)
+GPIO.setup(10, GPIO.OUT)
+GPIO.output(5, GPIO.HIGH)
+GPIO.output(7, GPIO.LOW)
+GPIO.output(8, GPIO.HIGH)
+GPIO.output(10, GPIO.LOW)
 """
 NOTES - pygame events and values
 
@@ -61,6 +69,10 @@ class XboxController(threading.Thread):
     aValue = GPIO.HIGH
     bValue = GPIO.HIGH
     cValue = GPIO.HIGH
+    leftTopPin = GPIO.LOW
+    leftBotPin = GPIO.LOW
+    rightTopPin = GPIO.LOW
+    rightBotPin = GPIO.LOW
 
     #internal ids for the xbox controls
     class XboxControls():
@@ -273,13 +285,13 @@ class XboxController(threading.Thread):
         self._start()
 
     def write_outputs(self):
-        #GPIO.output(18, GPIO.LOW)
-        #GPIO.output(24, GPIO.LOW)
-	#GPIO.output(26, GPIO.LOW)
-		
-	GPIO.output(18, self.aValue)
+        GPIO.output(18, self.aValue)
         GPIO.output(24, self.bValue)
         GPIO.output(26, self.cValue)
+	GPIO.output(5, self.leftTopPin)
+	GPIO.output(7, self.leftBotPin)
+	GPIO.output(8, self.rightTopPin)
+	GPIO.output(10, self.rightBotPin)
 
     #start the controller
     def _start(self):
@@ -290,10 +302,7 @@ class XboxController(threading.Thread):
         while(self.running):
             #react to the pygame events that come from the xbox controller
 	    self.write_outputs()
-            #GPIO.output(18, self.aValue)
-            #GPIO.output(24, self.bValue)
-            #GPIO.output(26, self.cValue)
-            #print(self.aValue, self.bValue, self.cValue)
+            
             for event in pygame.event.get():
 
                 #thumb sticks, trigger buttons                    
@@ -396,10 +405,6 @@ if __name__ == '__main__':
     #setup xbox controller, set out the deadzone and scale, also invert the Y Axis (for some reason in Pygame negative is up - wierd! 
     xboxCont = XboxController(controlCallBack, deadzone = 30, scale = 100, invertYAxis = True)
 
-    #currAValue = GPIO.LOW
-    #currBValue = GPIO.LOW
-    #currCValue = GPIO.LOW
-
     def setDirection(a, b, c):
 	
 	xboxCont.aValue = a
@@ -407,64 +412,43 @@ if __name__ == '__main__':
         xboxCont.cValue = c
 	print(a, b, c, "|", xboxCont.aValue, xboxCont.bValue, xboxCont.cValue)
 	xboxCont.write_outputs()
+    
+    def setDirections(lt, lb, rt, rb):
+	xboxCont.leftTopPin = lt
+	xboxCont.leftBotPin = lb
+	xboxCont.rightTopPin = rt
+	xboxCont.rightBotPin = rb
+	xboxCont.write_outputs();
 
     def aBtnCallback(id):
-        #print("A, 18: 0; 24: 0; 26: 1")
-	#xboxCont.aValue = GPIO.LOW
-	#xboxCont.bValue = GPIO.LOW
-	#xboxCont.cValue = GPIO.HIGH
-	currAValue = GPIO.LOW
+        currAValue = GPIO.LOW
         currBValue = GPIO.HIGH
         currCValue = GPIO.LOW
-        setDirection(GPIO.LOW, GPIO.LOW, GPIO.LOW)
+        #setDirection(GPIO.LOW, GPIO.LOW, GPIO.LOW)
+	setDirections(GPIO.LOW, GPIO.HIGH, GPIO.LOW, GPIO.HIGH)
 
     def bBtnCallback(id):
-        #print("B, 18: 0; 24: 1; 26: 0")
- 	#xboxCont.aValue = GPIO.LOW
-	##xboxCont.bValue = GPIO.HIGH
-	#xboxCont.cValue = GPIO.LOW
-
         currAValue = GPIO.LOW
         currBValue = GPIO.LOW
         currCValue = GPIO.HIGH
         setDirection(GPIO.HIGH, GPIO.LOW, GPIO.LOW)
+	setDirections(GPIO.HIGH, GPIO.LOW, GPIO.LOW, GPIO.HIGH)
 
     def xBtnCallback(id):
-        #print("X, 18: 1; 24: 0; 26: 0")
-	#xboxCont.aValue = GPIO.HIGH
-	#xboxCont.bValue = GPIO.LOW
-	#xboxCont.cValue = GPIO.LOW
-        
-        
-        
-        setDirection(GPIO.LOW, GPIO.HIGH, GPIO.LOW)
+        setDirections(GPIO.LOW, GPIO.HIGH, GPIO.HIGH, GPIO.LOW)
 	
     def yBtnCallback(id):
-        #print("Y, 18: 1; 24: 1; 26: 0")
-        #xboxCont.aValue = GPIO.HIGH
-	#xboxCont.bValue = GPIO.HIGH
-	#xboxCont.cValue = GPIO.LOW
-	
-	
-        
-        setDirection(GPIO.HIGH, GPIO.HIGH, GPIO.LOW)
+        setDirections(GPIO.HIGH, GPIO.LOW, GPIO.HIGH, GPIO.LOW)
 
     def rTriggerCallback(id):
-        #print("Right trigger, 18: 0; 24: 0; 26: 0")
-        #xboxCont.aValue = GPIO.HIGH
-	#xboxCont.bValue = GPIO.HIGH
-	#xboxCont.cValue = GPIO.HIGH
-	currAValue = GPIO.HIGH
-	
-	currCValue = GPIO.HIGH
-	setDirection(GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
+        setDirections(GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
 
     def stopCallback(id):
         xboxCont.aValue = GPIO.HIGH
 	xboxCont.bValue = GPIO.HIGH
 
 	xboxCont.cValue = GPIO.HIGH
-        setDirection(currAValue, currBValue, GPIO.HIGH)
+        setDirections(GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
 
     def goCallback(id):
         setDirection(currAValue, currBValue, GPIO.LOW)
