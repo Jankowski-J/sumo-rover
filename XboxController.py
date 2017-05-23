@@ -11,9 +11,6 @@ import threading
 import time
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(26, GPIO.OUT)
-GPIO.setup(24, GPIO.OUT)
-GPIO.output(24, GPIO.HIGH)
 GPIO.setup(18, GPIO.OUT)
 GPIO.setup(5, GPIO.OUT)
 GPIO.setup(7, GPIO.OUT)
@@ -61,19 +58,81 @@ event.value
 [1].+1 - top
 
 """
+class RoverController():
+    leftPinTop = 5
+    leftPinTopValue = GPIO.HIGH
+    leftPinBot = 7
+    leftPinBotValue = GPIO.HIGH
+
+    rightPinTop = 8
+    rightPinTopValue = GPIO.HIGH
+    rightPinBot = 10
+    rightPinBotValue = GPIO.HIGH
+
+    def _writeOutputs(self):
+	GPIO.output(self.leftPinTop, self.leftPinTopValue)
+	GPIO.output(self.leftPinBot, self.leftPinBotValue)
+	GPIO.output(self.rightPinTop, self.rightPinTopValue)
+	GPIO.output(self.rightPinBot, self.rightPinBotValue)
+	
+    def _hardStop(self):
+	self.leftPinTopValue = GPIO.HIGH
+	self.leftPinBotValue = GPIO.HIGH
+	self.rightPinTopValue = GPIO.HIGH
+	self.rightPinBotValue = GPIO.HIGH
+
+    def _spinLeftEngineClockwise(self):
+	self.leftPinTopValue = GPIO.HIGH
+	self.leftPinBotValue = GPIO.LOW
+
+    def _spinLeftEngineCounterClockwise(self):
+	self.leftPinTopValue = GPIO.LOW
+	self.leftPinBotValue = GPIO.HIGH
+
+    def _spinRightEngineClockwise(self):
+	self.rightPinTopValue = GPIO.HIGH
+	self.rightPinBotValue = GPIO.LOW
+
+    def _spinRightEngineCounterClockwise(self):
+	self.rightPinTopValue = GPIO.LOW
+	self.rightPinBotValue = GPIO.HIGH
+
+    def goForwards(self):
+	self._spinLeftEngineClockwise()
+	self._spinRightEngineClockwise()
+	self.go()
+
+    def goBackwards(self):
+	self._spinLeftEngineCounterClockwise()
+	self._spinRightEngineCounterClockwise()
+	self.go()
+
+    def go(self):
+	self._writeOutputs()
+
+    def turnLeft(self):
+	self._spinLeftEngineClockwise()
+	self._spinRightEngineCounterClockwise()
+	self.go()
+	time.sleep(10)
+	self.goForwards()
+
+    def turnRight(self):
+	self._spinLeftEngineCounterClockwise()
+	self._spinRightEngineClockwise()
+	self.go()
+	time.sleep(10)
+	self.goForwards()
+
+    def stop(self):
+	self._hardStop()
+	self._writeOutputs()
+	
 
 
 #Main class for reading the xbox controller values
 class XboxController(threading.Thread):
     
-    aValue = GPIO.HIGH
-    bValue = GPIO.HIGH
-    cValue = GPIO.HIGH
-    leftTopPin = GPIO.LOW
-    leftBotPin = GPIO.LOW
-    rightTopPin = GPIO.LOW
-    rightBotPin = GPIO.LOW
-
     #internal ids for the xbox controls
     class XboxControls():
         LTHUMBX = 0
@@ -284,15 +343,6 @@ class XboxController(threading.Thread):
     def run(self):
         self._start()
 
-    def write_outputs(self):
-        GPIO.output(18, self.aValue)
-        GPIO.output(24, self.bValue)
-        GPIO.output(26, self.cValue)
-	GPIO.output(5, self.leftTopPin)
-	GPIO.output(7, self.leftBotPin)
-	GPIO.output(8, self.rightTopPin)
-	GPIO.output(10, self.rightBotPin)
-
     #start the controller
     def _start(self):
         
@@ -301,9 +351,7 @@ class XboxController(threading.Thread):
         #run until the controller is stopped
         while(self.running):
             #react to the pygame events that come from the xbox controller
-	    self.write_outputs()
-            
-            for event in pygame.event.get():
+	    for event in pygame.event.get():
 
                 #thumb sticks, trigger buttons                    
                 if event.type == JOYAXISMOTION:
@@ -381,10 +429,7 @@ class XboxController(threading.Thread):
         #if the button is down its 1, if the button is up its 0
         value = 1 if eventType == JOYBUTTONDOWN else 0
         return value
-    
-currAValue = GPIO.LOW
-currBValue = GPIO.LOW
-currCValue = GPIO.LOW
+
 #tests
 if __name__ == '__main__':
 
@@ -404,55 +449,29 @@ if __name__ == '__main__':
 
     #setup xbox controller, set out the deadzone and scale, also invert the Y Axis (for some reason in Pygame negative is up - wierd! 
     xboxCont = XboxController(controlCallBack, deadzone = 30, scale = 100, invertYAxis = True)
-
-    def setDirection(a, b, c):
-	
-	xboxCont.aValue = a
-        xboxCont.bValue = b
-        xboxCont.cValue = c
-	print(a, b, c, "|", xboxCont.aValue, xboxCont.bValue, xboxCont.cValue)
-	xboxCont.write_outputs()
-    
-    def setDirections(lt, lb, rt, rb):
-	xboxCont.leftTopPin = lt
-	xboxCont.leftBotPin = lb
-	xboxCont.rightTopPin = rt
-	xboxCont.rightBotPin = rb
-	xboxCont.write_outputs();
+    roverCont = RoverController()
 
     def aBtnCallback(id):
-        currAValue = GPIO.LOW
-        currBValue = GPIO.HIGH
-        currCValue = GPIO.LOW
-        #setDirection(GPIO.LOW, GPIO.LOW, GPIO.LOW)
-	setDirections(GPIO.LOW, GPIO.HIGH, GPIO.LOW, GPIO.HIGH)
+        roverCont.goBackwards()
 
     def bBtnCallback(id):
-        currAValue = GPIO.LOW
-        currBValue = GPIO.LOW
-        currCValue = GPIO.HIGH
-        setDirection(GPIO.HIGH, GPIO.LOW, GPIO.LOW)
-	setDirections(GPIO.HIGH, GPIO.LOW, GPIO.LOW, GPIO.HIGH)
+        roverCont.turnRight()
 
     def xBtnCallback(id):
-        setDirections(GPIO.LOW, GPIO.HIGH, GPIO.HIGH, GPIO.LOW)
+	roverCont.turnLeft()
 	
     def yBtnCallback(id):
-        setDirections(GPIO.HIGH, GPIO.LOW, GPIO.HIGH, GPIO.LOW)
+        roverCont.goForwards()
 
     def rTriggerCallback(id):
-        setDirections(GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
+        roverCont.stop()
 
     def stopCallback(id):
-        xboxCont.aValue = GPIO.HIGH
-	xboxCont.bValue = GPIO.HIGH
-
-	xboxCont.cValue = GPIO.HIGH
-        setDirections(GPIO.HIGH, GPIO.HIGH, GPIO.HIGH, GPIO.HIGH)
+        roverCont.stop()
 
     def goCallback(id):
-        setDirection(currAValue, currBValue, GPIO.LOW)
-
+	roverCont.goForwards()
+        
     #setup the left thumb (X & Y) callbacks
     xboxCont.setupControlCallback(xboxCont.XboxControls.LTHUMBX, leftThumbX)
     xboxCont.setupControlCallback(xboxCont.XboxControls.LTHUMBY, leftThumbY)
@@ -470,6 +489,7 @@ if __name__ == '__main__':
         print "xbox controller running"
         while True:
             time.sleep(1)
+            roverCont.go()
 
     #Ctrl C
     except KeyboardInterrupt:
