@@ -117,16 +117,12 @@ class RoverController():
 	self._spinLeftEngineClockwise()
 	self._spinRightEngineCounterClockwise()
 	self.go()
-	#time.sleep(0.75)
-	#self.goForwards()
 
-    def turnRight(self):
+   def turnRight(self):
 	self._spinLeftEngineCounterClockwise()
 	self._spinRightEngineClockwise()
 	self.go()
-	#time.sleep(0.75)
-	#self.goForwards()
-
+	
     def stop(self):
 	self._hardStop()
 	self._writeOutputs()
