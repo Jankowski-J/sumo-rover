@@ -10,6 +10,7 @@ import os, sys
 import threading
 import time
 import RPi.GPIO as GPIO
+GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(18, GPIO.OUT)
 GPIO.setup(5, GPIO.OUT)
@@ -59,17 +60,18 @@ event.value
 
 """
 class RoverController():
-    leftPinTop = 5
+    leftPinTop = 8
     leftPinTopValue = GPIO.HIGH
-    leftPinBot = 7
+    leftPinBot = 10
     leftPinBotValue = GPIO.HIGH
 
-    rightPinTop = 8
+    rightPinTop = 5
     rightPinTopValue = GPIO.HIGH
-    rightPinBot = 10
+    rightPinBot = 7
     rightPinBotValue = GPIO.HIGH
 
     def _writeOutputs(self):
+	print(self.leftPinTopValue, self.leftPinBotValue, self.rightPinTopValue, self.rightPinBotValue)
 	GPIO.output(self.leftPinTop, self.leftPinTopValue)
 	GPIO.output(self.leftPinBot, self.leftPinBotValue)
 	GPIO.output(self.rightPinTop, self.rightPinTopValue)
@@ -109,20 +111,21 @@ class RoverController():
 
     def go(self):
 	self._writeOutputs()
+	return None
 
     def turnLeft(self):
 	self._spinLeftEngineClockwise()
 	self._spinRightEngineCounterClockwise()
 	self.go()
-	time.sleep(10)
-	self.goForwards()
+	#time.sleep(0.75)
+	#self.goForwards()
 
     def turnRight(self):
 	self._spinLeftEngineCounterClockwise()
 	self._spinRightEngineClockwise()
 	self.go()
-	time.sleep(10)
-	self.goForwards()
+	#time.sleep(0.75)
+	#self.goForwards()
 
     def stop(self):
 	self._hardStop()
@@ -206,7 +209,9 @@ class XboxController(threading.Thread):
                  joystickNo = 0,
                  deadzone = 0.1,
                  scale = 1,
-                 invertYAxis = False):
+                 invertYAxis = False,
+		 callback = None):
+	self._mainLoopCallback = callback
 
         #setup threading
         threading.Thread.__init__(self)
@@ -351,6 +356,8 @@ class XboxController(threading.Thread):
         #run until the controller is stopped
         while(self.running):
             #react to the pygame events that come from the xbox controller
+            if self._mainLoopCallback != None:
+                self._mainLoopCallback()
 	    for event in pygame.event.get():
 
                 #thumb sticks, trigger buttons                    
@@ -438,9 +445,11 @@ if __name__ == '__main__':
     def controlCallBack(xboxControlId, value):
         print "Control Id = {}, Value = {}".format(xboxControlId, value)
 
- 
-    
-    #def 
+    roverCont = RoverController()
+       
+    def go():
+	roverCont.go()
+
     #specific callbacks for the left thumb (X & Y)
     def leftThumbX(xValue):
         print "LX {}".format(xValue)
@@ -448,8 +457,9 @@ if __name__ == '__main__':
         print "LY {}".format(yValue)
 
     #setup xbox controller, set out the deadzone and scale, also invert the Y Axis (for some reason in Pygame negative is up - wierd! 
-    xboxCont = XboxController(controlCallBack, deadzone = 30, scale = 100, invertYAxis = True)
-    roverCont = RoverController()
+    xboxCont = XboxController(controlCallBack, deadzone = 30, scale = 100, invertYAxis = True, callback = go)
+
+
 
     def aBtnCallback(id):
         roverCont.goBackwards()
@@ -471,7 +481,7 @@ if __name__ == '__main__':
 
     def goCallback(id):
 	roverCont.goForwards()
-        
+    
     #setup the left thumb (X & Y) callbacks
     xboxCont.setupControlCallback(xboxCont.XboxControls.LTHUMBX, leftThumbX)
     xboxCont.setupControlCallback(xboxCont.XboxControls.LTHUMBY, leftThumbY)
@@ -489,7 +499,7 @@ if __name__ == '__main__':
         print "xbox controller running"
         while True:
             time.sleep(1)
-            roverCont.go()
+            #roverCont._writeOutputs()
 
     #Ctrl C
     except KeyboardInterrupt:
@@ -502,4 +512,5 @@ if __name__ == '__main__':
         
     finally:
         #stop the controller
-        xboxCont.stop()
+	xboxCont.stop()
+	roverCont.stop()
