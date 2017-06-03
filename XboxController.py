@@ -118,7 +118,8 @@ class RoverController():
 	self._spinRightEngineCounterClockwise()
 	self.go()
 
-   def turnRight(self):
+   
+    def turnRight(self):
 	self._spinLeftEngineCounterClockwise()
 	self._spinRightEngineClockwise()
 	self.go()
