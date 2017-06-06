@@ -83,6 +83,14 @@ class RoverController():
 	self.rightPinTopValue = GPIO.HIGH
 	self.rightPinBotValue = GPIO.HIGH
 
+    def _stopLeftEngine(self):
+	self.leftPinTopValue = GPIO.HIGH
+	self.leftPinBotValue = GPIO.HIGH
+
+    def _stopRightEngine(self):
+	self.rightPinTopValue = GPIO.HIGH
+	self.rightPinBotValue = GPIO.HIGH
+
     def _spinLeftEngineClockwise(self):
 	self.leftPinTopValue = GPIO.HIGH
 	self.leftPinBotValue = GPIO.LOW
@@ -113,14 +121,13 @@ class RoverController():
 	self._writeOutputs()
 	return None
 
-    def turnLeft(self):
-	self._spinLeftEngineClockwise()
-	self._spinRightEngineCounterClockwise()
-	self.go()
-
-   
     def turnRight(self):
-	self._spinLeftEngineCounterClockwise()
+	self._spinLeftEngineClockwise()
+	self._stopRightEngine()
+	self.go()
+   
+    def turnLeft(self):
+	self._stopLeftEngine()
 	self._spinRightEngineClockwise()
 	self.go()
 	
@@ -128,7 +135,6 @@ class RoverController():
 	self._hardStop()
 	self._writeOutputs()
 	
-
 
 #Main class for reading the xbox controller values
 class XboxController(threading.Thread):
