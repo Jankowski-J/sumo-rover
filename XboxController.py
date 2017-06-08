@@ -81,7 +81,7 @@ class RoverController():
     rightPower = GPIO.PWM(12, 50)
     rightPower.start(100)
 
-    lowPowerLevel = 75
+    lowPowerLevel = 32.5
 
     def _writeOutputs(self):
 	print(self.leftPinTopValue, self.leftPinBotValue, self.rightPinTopValue, self.rightPinBotValue)
