@@ -17,10 +17,13 @@ GPIO.setup(5, GPIO.OUT)
 GPIO.setup(7, GPIO.OUT)
 GPIO.setup(8, GPIO.OUT)
 GPIO.setup(10, GPIO.OUT)
+GPIO.setup(12, GPIO.OUT)
 GPIO.output(5, GPIO.HIGH)
 GPIO.output(7, GPIO.LOW)
 GPIO.output(8, GPIO.HIGH)
 GPIO.output(10, GPIO.LOW)
+GPIO.setup(11, GPIO.OUT)
+
 """
 NOTES - pygame events and values
 
@@ -65,10 +68,20 @@ class RoverController():
     leftPinBot = 10
     leftPinBotValue = GPIO.HIGH
 
+    leftPowerPin = 11
+    leftPower = GPIO.PWM(11, 50)
+    leftPower.start(100)
+
     rightPinTop = 5
     rightPinTopValue = GPIO.HIGH
     rightPinBot = 7
     rightPinBotValue = GPIO.HIGH
+
+    rightPowerPin = 12
+    rightPower = GPIO.PWM(12, 50)
+    rightPower.start(100)
+
+    lowPowerLevel = 75
 
     def _writeOutputs(self):
 	print(self.leftPinTopValue, self.leftPinBotValue, self.rightPinTopValue, self.rightPinBotValue)
@@ -107,14 +120,30 @@ class RoverController():
 	self.rightPinTopValue = GPIO.LOW
 	self.rightPinBotValue = GPIO.HIGH
 
+    def _toggleLeftEnginePower(self, fullPower = True):
+	if fullPower:
+	    self.leftPower.ChangeDutyCycle(100)
+	else:
+	    self.leftPower.ChangeDutyCycle(self.lowPowerLevel)
+
+    def _toggleRightEnginePower(self, fullPower = True):
+	if fullPower:
+	    self.rightPower.ChangeDutyCycle(100)
+	else:
+	    self.rightPower.ChangeDutyCycle(self.lowPowerLevel)
+
     def goForwards(self):
 	self._spinLeftEngineClockwise()
+	self._toggleLeftEnginePower(True)
 	self._spinRightEngineClockwise()
+	self._toggleRightEnginePower(True)
 	self.go()
 
     def goBackwards(self):
 	self._spinLeftEngineCounterClockwise()
+	self._toggleLeftEnginePower(True)
 	self._spinRightEngineCounterClockwise()
+	self._toggleRightEnginePower(True)
 	self.go()
 
     def go(self):
@@ -122,19 +151,18 @@ class RoverController():
 	return None
 
     def turnRight(self):
-	self._spinLeftEngineClockwise()
-	self._stopRightEngine()
+	self._toggleLeftEnginePower(True)
+	self._toggleRightEnginePower(False)
 	self.go()
    
     def turnLeft(self):
-	self._stopLeftEngine()
-	self._spinRightEngineClockwise()
+	self._toggleLeftEnginePower(False)
+	self._toggleRightEnginePower(True)
 	self.go()
 	
     def stop(self):
 	self._hardStop()
-	self._writeOutputs()
-	
+	self._writeOutputs()	
 
 #Main class for reading the xbox controller values
 class XboxController(threading.Thread):
@@ -462,8 +490,6 @@ if __name__ == '__main__':
     #setup xbox controller, set out the deadzone and scale, also invert the Y Axis (for some reason in Pygame negative is up - wierd! 
     xboxCont = XboxController(controlCallBack, deadzone = 30, scale = 100, invertYAxis = True, callback = go)
 
-
-
     def aBtnCallback(id):
         roverCont.goBackwards()
 
@@ -475,9 +501,6 @@ if __name__ == '__main__':
 	
     def yBtnCallback(id):
         roverCont.goForwards()
-
-    def rTriggerCallback(id):
-        roverCont.stop()
 
     def stopCallback(id):
         roverCont.stop()
@@ -492,8 +515,6 @@ if __name__ == '__main__':
     xboxCont.setupControlCallback(xboxCont.XboxControls.B, bBtnCallback)
     xboxCont.setupControlCallback(xboxCont.XboxControls.X, xBtnCallback)
     xboxCont.setupControlCallback(xboxCont.XboxControls.Y, yBtnCallback)
-    xboxCont.setupControlCallback(xboxCont.XboxControls.RTRIGGER, rTriggerCallback)
-    xboxCont.setupControlCallback(xboxCont.XboxControls.BACK, rTriggerCallback)
     xboxCont.setupControlCallback(xboxCont.XboxControls.START, stopCallback)
     
     try:
