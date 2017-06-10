@@ -9,7 +9,6 @@ from pygame.locals import *
 import os, sys
 import threading
 import time
-from RoverController import RoverController
 
 """
 NOTES - pygame events and values
@@ -243,9 +242,9 @@ class XboxController(threading.Thread):
     #setup pygame
     def _setupPygame(self, joystickNo):
         # set SDL to use the dummy NULL video driver, so it doesn't need a windowing system.
-        #os.environ["SDL_VIDEODRIVER"] = "dummy"
         #os.putenv("SDL_VIDEODRIVER", "fbcon")
-        os.environ["SDL_VIDEODRIVER"] = "dummy"
+        #os.environ["SDL_VIDEODRIVER"] = "dummy"
+	os.environ["SDL_VIDEODRIVER"] = "fbcon"
         pygame.display.init()
         # init pygame
         pygame.init()

@@ -1,5 +1,6 @@
-import RoverController from RoverController
-import XboxController from XboxController
+from RoverController import RoverController
+from XboxController import XboxController
+import sys
 
 if __name__ == '__main__':
     
@@ -41,6 +42,10 @@ if __name__ == '__main__':
         
     def goCallback(id):
 	roverCont.goForwards()
+
+    def exitCallback(id):
+	xboxCont.stop()
+	roverCont.stop()
     
     #setup the left thumb (X & Y) callbacks
     xboxCont.setupControlCallback(xboxCont.XboxControls.LTHUMBX, leftThumbX)
@@ -51,6 +56,7 @@ if __name__ == '__main__':
     xboxCont.setupControlCallback(xboxCont.XboxControls.Y, yBtnCallback)
     xboxCont.setupControlCallback(xboxCont.XboxControls.START, startCallback)
     xboxCont.setupControlCallback(xboxCont.XboxControls.BACK, stopCallback)
+    xboxCont.setupControlCallback(xboxCont.XboxControls.XBOX, exitCallback)
     
     try:
         #start the controller
@@ -58,8 +64,7 @@ if __name__ == '__main__':
         print "xbox controller running"
         while True:
             time.sleep(1)
-            #roverCont._writeOutputs()
-
+            
     #Ctrl C
     except KeyboardInterrupt:
         print "User cancelled"
