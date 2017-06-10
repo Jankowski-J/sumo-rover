@@ -194,13 +194,11 @@ class XboxController(threading.Thread):
 
     @property
     def A(self):
-	GPIO.output(26, GPIO.HIGH)
-        return self.controlValues[self.XboxControls.A]
+	return self.controlValues[self.XboxControls.A]
 
     @property
     def B(self):
-	GPIO.output(26, GPIO.LOW)
-        return self.controlValues[self.XboxControls.B]
+	return self.controlValues[self.XboxControls.B]
 
     @property
     def X(self):
