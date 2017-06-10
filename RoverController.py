@@ -1,20 +1,21 @@
 import RPi.GPIO as GPIO
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(18, GPIO.OUT)
-GPIO.setup(5, GPIO.OUT)
-GPIO.setup(7, GPIO.OUT)
-GPIO.setup(8, GPIO.OUT)
-GPIO.setup(10, GPIO.OUT)
-GPIO.setup(12, GPIO.OUT)
-GPIO.output(5, GPIO.HIGH)
-GPIO.output(7, GPIO.LOW)
-GPIO.output(8, GPIO.HIGH)
-GPIO.output(10, GPIO.LOW)
-GPIO.setup(11, GPIO.OUT)
 
+'''
+    This class is used to control a two-motor rover, 
+    which has tracks. It is assumed, that it uses a Pololu controller.
+'''
 class RoverController():
     
+    '''
+        Constructor paramaters:
+        stbyPin - board number of STBY pin, which turns the Pololu controller on/off
+        leftTopPin, leftBotPin - left engine inputs
+        leftPowerPin - through this pin, a PWM signal for left engine is outputted
+        rightTopPin, rightBotPin - right engine inputs
+        rightPowerPin - through this pin, a PWM signal for right engine is outputted
+    '''
     def __init__(self, stbyPin=13, leftTopPin=8, leftBotPin=10,
 	leftPowerPin=11, rightTopPin=5, rightBotPin=7, rightPowerPin=12):
 	self.stbyPin = stbyPin
