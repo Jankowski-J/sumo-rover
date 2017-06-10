@@ -63,6 +63,12 @@ event.value
 
 """
 class RoverController():
+    
+    def __init__(self, stbyPin = 13):
+	self.stbyPin = stbyPin
+	GPIO.setup(self.stbyPin, GPIO.OUT)
+	GPIO.output(self.stbyPin, GPIO.LOW)
+
     leftPinTop = 8
     leftPinTopValue = GPIO.HIGH
     leftPinBot = 10
@@ -81,7 +87,11 @@ class RoverController():
     rightPower = GPIO.PWM(12, 50)
     rightPower.start(100)
 
-    lowPowerLevel = 32.5
+    lowPowerLevel = 55
+
+    def start(self):
+	GPIO.output(self.stbyPin, GPIO.HIGH)
+	self.goForwards()
 
     def _writeOutputs(self):
 	print(self.leftPinTopValue, self.leftPinBotValue, self.rightPinTopValue, self.rightPinBotValue)
@@ -502,9 +512,12 @@ if __name__ == '__main__':
     def yBtnCallback(id):
         roverCont.goForwards()
 
-    def stopCallback(id):
-        roverCont.stop()
+    def startCallback(id):
+	roverCont.start()
 
+    def stopCallback(id):
+	roverCont.stop()
+        
     def goCallback(id):
 	roverCont.goForwards()
     
@@ -515,7 +528,8 @@ if __name__ == '__main__':
     xboxCont.setupControlCallback(xboxCont.XboxControls.B, bBtnCallback)
     xboxCont.setupControlCallback(xboxCont.XboxControls.X, xBtnCallback)
     xboxCont.setupControlCallback(xboxCont.XboxControls.Y, yBtnCallback)
-    xboxCont.setupControlCallback(xboxCont.XboxControls.START, stopCallback)
+    xboxCont.setupControlCallback(xboxCont.XboxControls.START, startCallback)
+    xboxCont.setupControlCallback(xboxCont.XboxControls.BACK, stopCallback)
     
     try:
         #start the controller
