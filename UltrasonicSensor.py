@@ -53,3 +53,6 @@ class UltrasonicSensor:
   def readInLoop(self):
     while True:
       self._read()
+
+  def getName(self):
+    return self.name
