@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO                    
 import time                                
+import sys
 GPIO.setmode(GPIO.BOARD)                    
 GPIO.setwarnings(False)
 
@@ -14,31 +15,35 @@ class UltrasonicSensor:
     GPIO.setup(self.echoPin, GPIO.IN)
 
   def _read(self):
-    GPIO.output(self.triggerPin, GPIO.LOW)
-    time.sleep(0.5)
+    try:
+      GPIO.output(self.triggerPin, GPIO.LOW)
+      time.sleep(0.5)
     
-    GPIO.output(self.triggerPin, GPIO.HIGH)
-    time.sleep(0.00001)
-    GPIO.output(self.triggerPin, GPIO.LOW)
+      GPIO.output(self.triggerPin, GPIO.HIGH)
+      time.sleep(0.00001)
+      GPIO.output(self.triggerPin, GPIO.LOW)
    
-    pulse_start = 0
-    pulse_end = 0
+      pulse_start = 0
+      pulse_end = 0
 
-    while GPIO.input(self.echoPin) == 0:
-      pulse_start = time.time();
+      while GPIO.input(self.echoPin) == 0:
+        pulse_start = time.time();
 
-    while GPIO.input(self.echoPin) == 1:
-      pulse_end = time.time()
+      while GPIO.input(self.echoPin) == 1:
+        pulse_end = time.time()
 
-    pulse_duration = pulse_end - pulse_start
+      pulse_duration = pulse_end - pulse_start
 
-    distance = pulse_duration * 17150
-    distance = round(distance, 2)
+      distance = pulse_duration * 17150
+      distance = round(distance, 2)
 
-    if distance > 2 and distance <= 200:
-      print(self._formattedName(), " Distance:", distance, "cm")
-    else:
-      print(self._formattedName(), "Out of range")
+      if distance > 2 and distance <= 200:
+        print(self._formattedName(), " Distance:", distance, "cm")
+      else:
+        print(self._formattedName(), "Out of range")
+
+    except:
+      print(self._formattedName(), "Unexpected error:", sys.exc_info()[0])
 
   def _formattedName(self):
     formatted = "[ UltrasonicSensor: " + self.name + " ]"
