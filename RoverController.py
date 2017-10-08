@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BCM)
 
 '''
     This class is used to control a two-motor rover, 
@@ -16,8 +16,8 @@ class RoverController():
         rightTopPin, rightBotPin - right engine inputs
         rightPowerPin - through this pin, a PWM signal for right engine is outputted
     '''
-    def __init__(self, stbyPin=13, leftTopPin=8, leftBotPin=10,
-	leftPowerPin=11, rightTopPin=5, rightBotPin=7, rightPowerPin=12):
+    def __init__(self, stbyPin=12, leftTopPin=24, leftBotPin=23,
+	leftPowerPin=18, rightTopPin=20, rightBotPin=21, rightPowerPin=16):
 	self.stbyPin = stbyPin
 
 	self.leftTopPin = leftTopPin
