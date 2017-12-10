@@ -52,8 +52,8 @@ class RoverController():
 	GPIO.output(self.rightBotPin, self.rightBotPinValue)
 	self.rightPower = GPIO.PWM(self.rightPowerPin, 50)
 
-    LOW_POWER_LEVEL = 40
-    HIGH_POWER_LEVEL = 100
+    LOW_POWER_LEVEL = 30
+    HIGH_POWER_LEVEL = 60
 
     def start(self):
         GPIO.output(self.stbyPin, GPIO.HIGH)
