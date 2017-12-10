@@ -37,8 +37,7 @@ if __name__ == '__main__':
     wsad = WsadController(w=(lambda: roverController.goForwards())
    
     try:
-        #start the controller
-        wsad.start()
+	wsad.start()
         print "keyboard controller running"
         while True:
             time.sleep(1)

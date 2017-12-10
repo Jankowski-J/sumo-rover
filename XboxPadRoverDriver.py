@@ -1,6 +1,7 @@
 from RoverController import RoverController
 from XboxController import XboxController
 import sys
+import time
 
 if __name__ == '__main__':
     
@@ -26,9 +27,11 @@ if __name__ == '__main__':
         roverCont.goBackwards()
 
     def bBtnCallback(id):
+	print("turning right")
         roverCont.turnRight()
 
     def xBtnCallback(id):
+	print("turning left")
 	roverCont.turnLeft()
 	
     def yBtnCallback(id):
