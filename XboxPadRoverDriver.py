@@ -39,6 +39,8 @@ if __name__ == '__main__':
 
 
     def leftThumbY(yValue):
+        left_power = 100
+        right_power = 100
         power = yValue
         roverCont.steer(power, left_power, right_power)
         print "LY {}".format(yValue)
