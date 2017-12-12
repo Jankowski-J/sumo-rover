@@ -170,7 +170,10 @@ class RoverController():
             self._spinLeftEngineCounterClockwise()
             self._spinRightEngineCounterClockwise()
 
-        power = RoverController.normalize_power(power)
+        power = abs(power)
+        if power > 100:
+            power = 100
+
         left_power = RoverController.normalize_power(left_power)
         right_power = RoverController.normalize_power(right_power)
 
