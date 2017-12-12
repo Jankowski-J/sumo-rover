@@ -156,8 +156,8 @@ class RoverController():
     def normalize_power(power):
         if power > 100:
             power = 100
-        if power < -100:
-            power = -100
+        if power < 0:
+            power = 0
 
         return power
 
