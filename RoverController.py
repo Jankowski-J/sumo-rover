@@ -145,12 +145,12 @@ class RoverController():
         self._writeOutputs()
 
     def _rev_left_engine(self, max_power_level=100):
-        power_level = RoverController.HIGH_POWER_LEVEL * max_power_level / 100
-        self.left_engine.ChangeDutyCycle(power_level)
+        left_power_level = RoverController.HIGH_POWER_LEVEL * max_power_level / 100
+        self.left_engine.ChangeDutyCycle(left_power_level)
 
     def _rev_right_engine(self, max_power_level=100):
-        power_level = RoverController.HIGH_POWER_LEVEL * max_power_level / 100
-        self.right_engine.ChangeDutyCycle(power_level)
+        right_power_level = RoverController.HIGH_POWER_LEVEL * max_power_level / 100
+        self.right_engine.ChangeDutyCycle(right_power_level)
 
     @staticmethod
     def normalize_power(power):
@@ -162,6 +162,7 @@ class RoverController():
         return power
 
     def steer(self, power=100, left_power=100, right_power=100):
+        print("power: ", power, "left: ", left_power, "right:", right_power)
         if power > 0:
             self._spinLeftEngineClockwise()
             self._spinRightEngineClockwise()
@@ -176,6 +177,7 @@ class RoverController():
         left_power = left_power * power / 100
         right_power = right_power * power / 100
 
+        print("reving, left: ", left_power, " right: ", right_power)
         self._rev_left_engine(left_power)
         self._rev_right_engine(right_power)
 
